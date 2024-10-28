@@ -9,7 +9,7 @@ def test_add():
     hash_table["salary"] = 120000
     hash_table["message"] = "Hello, World!"
 
-    # assert len(hash_table) == 2
+    assert len(hash_table) == 2
 
     assert hash_table["salary"] == 120000
     assert hash_table["message"] == "Hello, World!"
@@ -76,7 +76,19 @@ def test_HashTable():
 
 
 def main():
-    test_HashTable()
+    # test_HashTable()
+
+    # Example usage
+    ht = HashTable()
+    ht.add("apple")
+    ht.add("banana")
+    ht.add("cherry")
+
+    print("Hash Table:", ht)
+    print("Position of 'banana':", ht.get_position("banana"))
+    print("Position of 'cherry':", ht.get_position("cherry"))
+    print("Position of 'apple':", ht.get_position("apple"))
+    print("Position of 'non-existent key':", ht.get_position("non-existent key"))
 
 
 if __name__ == "__main__":
