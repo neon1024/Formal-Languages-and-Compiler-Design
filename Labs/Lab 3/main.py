@@ -27,29 +27,27 @@ def scan(file):
     separators = " ,;:()[]{}"
 
     with open(file) as input_file:
-        line = input_file.readline()
+        for line in input_file:
+            line_number += 1
 
-        line_number += 1
+            token_start = -1
 
-        token_start = -1
+            for character in line:
+                print(character)
+                column_number += 1
 
-        for character in line:
-            column_number += 1
+                token = ""
 
-            token = ""
+                if character in separators:
+                    if token_start != -1:  # we have a full token
+                        token = line[token_start:column_number - 1]
 
-            if character in separators:
-                if token_start != -1:  # we have a full token
-                    token = line[token_start:column_number]
+                        identify_token(token)
 
-                    identify_token(token)
-
-                token_start = -1  # reset the start of the token
-
-            if token_start == -1:  # we have a new token
-                token_start = column_number - 1
-
-
+                        token_start = -1  # reset the start of the token
+                else:
+                    if token_start == -1:  # we have a new token
+                        token_start = column_number - 1
 
 
 def main():
@@ -59,6 +57,7 @@ def main():
 
     for file in input_files:
         scan(file)
+        break
 
 
 if __name__ == "__main__":
