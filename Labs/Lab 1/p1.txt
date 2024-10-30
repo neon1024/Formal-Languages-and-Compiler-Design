@@ -1,0 +1,10 @@
+fun max_of_3(first: &num, second: &num, third: &num) -> num {
+	max_num: num = first;
+
+	if(second > max_num)
+		max_num = second;
+
+	max_num = third > max_num ? max_num = third : max_num;
+
+	ret max_num;
+}

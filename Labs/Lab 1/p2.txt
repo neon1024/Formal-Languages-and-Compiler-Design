@@ -1,0 +1,13 @@
+fun is_prime(candidate: &num) -> bool {
+	dividers: num = 0;
+
+	for(divider: num = 2; divider <= candidate / 2; divider++)
+		match(divider) {
+			case(candidate % divider == 0) =>
+				ret False;
+			default:
+				break;
+		}
+
+	ret True;
+}
