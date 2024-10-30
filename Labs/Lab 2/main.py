@@ -88,12 +88,14 @@ def is_prime(number):
 
     return True
 
+
 def test_is_prime():
     assert is_prime(1) == False
     assert is_prime(2) == True
     assert is_prime(25) == False
     assert is_prime(100) == False
     assert is_prime(101) == True
+
 
 def main():
     # test_HashTable()
@@ -122,6 +124,10 @@ def main():
     ht['12'] = 3
 
     print(ht)
+    print(ht.keys())
+
+    for key in ht.keys():
+        print(key)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
-class HashTable:
+class HashTable(dict):
     def __init__(self, capacity=10):
+        super().__init__()
         self.capacity = capacity
         self.size = 0
         self.table = [None] * self.capacity
@@ -138,6 +139,11 @@ class HashTable:
 
     def __len__(self):
         return self.size
+
+    def keys(self):
+        for item in self.table:
+            if item:
+                yield item[0]
 
     def __repr__(self):
         """return a string representation of the hash table"""
