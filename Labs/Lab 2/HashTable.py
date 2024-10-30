@@ -1,105 +1,147 @@
-# class HashTable(dict):
-#     DELETED = "DELETED"
-#
-#     def __init__(self):
-#         super().__init__()
-#         self.__key_value = []
-#         self.__free_position = 0
-#
-#     # def __setitem__(self, key, value):
-#     #     if value == HashTable.DELETED:
-#     #         raise "[!] Invalid value"
-#     #
-#     #     if self.__free_position >= len(self.__key_value):
-#     #         self.__key_value.append(value)
-#     #         self.__free_position += 1
-#     #     else:
-#     #         self.__key_value[self.__free_position] = value
-#     #
-#     #         while self.__free_position < len(self.__key_value) and self.__key_value[self.__free_position] != HashTable.DELETED:
-#     #             self.__free_position += 1
-#
-#     def __repr__(self):
-#         return str(self)
-#
-#     # TODO
-#     def __str__(self):
-#         pass
-
 class HashTable:
-    def __init__(self, capacity=11):
+    def __init__(self, capacity=10):
         self.capacity = capacity
-        self.table = [None] * capacity
         self.size = 0
+        self.table = [None] * self.capacity
+        self.load_factor_threshold = 0.7
 
-    def hash_2(self, key):
-        return key % self.capacity
-
-    def hash_1(self, key, index):
-        if isinstance(key, str):
-            ascii_sum = 0
-
-            for ch in key:
-                ascii_sum += ord(ch)
-
-            key = ascii_sum
-
-        return (self.hash_2(key) + index) % self.capacity
-
-    def hash(self, key):
-        index = 0
-
-        while index < self.capacity:
-            obtained_key = self.hash_1(key, index)
-
-            if self.table[obtained_key] is None:
-                return obtained_key
-
-            index += 1
-
-    def _hash(self, key):
+    def h2(self, key):
         return hash(key) % self.capacity
 
-    def _probe(self, hash_index):
-        """Linear probing"""
-        start_index = hash_index
+    def h1(self, key, index):
+        return (self.h2(key) + index) % self.capacity
 
-        while self.table[hash_index] is not None:
-            hash_index = (hash_index + 1) % self.capacity
+    def _is_prime(self, number):
+        if number < 2:
+            return False
 
-            if hash_index == start_index:  # Table is full
-                raise Exception("Hash table is full")
+        if number != 2 and number % 2 == 0:
+            return False
 
-        return hash_index
+        for div in range(3, number // 2 + 1, 2):
+            if number % div == 0:
+                return False
 
-    def add(self, key):
-        # hash_index = self._hash(key)
+        return True
 
-        # Find the next available slot
-        # index = self._probe(hash_index)
-        obtained_key = self.hash(key)
+    def _next_capacity(self, old_capacity):
+        current = old_capacity
 
-        # Store the key with its current position in the table
-        # self.table[index] = (key, self.size)
-        self.table[obtained_key] = (key, self.size)
-        self.size += 1  # Increment the count for the next position
+        while not self._is_prime(current):
+            current += 1
 
-    def get_position(self, key):
-        """Retrieve the position of a key."""
-        # hash_index = self._hash(key)
-        hash_index = self.hash(key)
-        start_index = hash_index
+        return current
 
-        # Use linear probing to search for the key
-        while self.table[hash_index] is not None:
-            stored_key, position = self.table[hash_index]
+    def _resize(self):
+        """resize the hash table when the load factor exceeds the threshold."""
+        old_table = self.table
+        self.capacity = self._next_capacity(self.capacity * 2)  # at least double the size
+        self.size = 0  # reset the size, will be updated as we reinsert
+        self.table = [None] * self.capacity  # create a new table
+
+        # reinsert all existing items into the new, larger table
+        for item in old_table:
+            if item is not None:
+                key, value = item
+                self.__setitem__(key, value)
+
+    def __setitem__(self, key, value):
+        """insert or update a (key, value) pair in the hash table using open addressing with double hashing"""
+        if self.size / self.capacity > self.load_factor_threshold:
+            self._resize()
+
+        index = self.h2(key)
+        i = 0
+
+        while self.table[index] is not None:
+            stored_key, _ = self.table[index]
+
             if stored_key == key:
-                return position
-            hash_index = (hash_index + 1) % self.capacity
-            if hash_index == start_index:  # Circled back, key not found
+                # update
+                self.table[index] = (key, value)
+                return
+
+            # collision
+            i += 1
+            index = self.h1(key, i)
+
+            if i >= self.capacity:
+                # TODO
+                pass
+
+        # insert
+        self.table[index] = (key, value)
+        self.size += 1
+
+    def __getitem__(self, key):
+        index = self.h2(key)
+        i = 0
+
+        while self.table[index] is not None:
+            stored_key, stored_value = self.table[index]
+
+            if stored_key == key:
+                # key found
+                return stored_value
+
+            # continue probing
+            i += 1
+            index = self.h1(key, i)
+
+            if i >= self.capacity:
                 break
-        return None  # Key not found
+
+        # key not found
+        raise KeyError(f"Key '{key}' not found")
+
+    def __delitem__(self, key):
+        """remove a (key, value) pair from the hash table using open addressing with double hashing"""
+        index = self.h2(key)
+        i = 0
+
+        while self.table[index] is not None:
+            stored_key, _ = self.table[index]
+
+            if stored_key == key:
+                # key found, remove it by setting the slot to "None"
+                self.table[index] = None
+                self.size -= 1
+
+                # rehash the elements after removal
+                self._rehash_after_removal(index)
+                return
+
+            # continue probing using double hashing
+            i += 1
+            index = self.h1(key, i)
+
+            if i >= self.capacity:
+                break
+
+        # Key not found
+        raise KeyError(f"Key '{key}' not found")
+
+    def _rehash_after_removal(self, remove_index):
+        """rehash items after removal to maintain proper probing sequence"""
+        i = 1
+        index = self.h1(remove_index, i)
+
+        while self.table[index] is not None:
+            stored_key, stored_value = self.table[index]
+
+            self.table[index] = None
+            self.size -= 1
+
+            self.__setitem__(stored_key, stored_value)
+            i += 1
+            index = self.h1(remove_index, i)
+
+    def __len__(self):
+        return self.size
+
+    def __repr__(self):
+        """return a string representation of the hash table"""
+        return str(self)
 
     def __str__(self):
-        """Return the hash table contents for visualization."""
-        return str([entry if entry is not None else None for entry in self.table])
+        return str([item if item is not None else 'Empty' for item in self.table])

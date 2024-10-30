@@ -75,20 +75,53 @@ def test_HashTable():
     # test_keys()
 
 
+def is_prime(number):
+    if number < 2:
+        return False
+
+    if number != 2 and number % 2 == 0:
+        return False
+
+    for div in range(3, number // 2 + 1, 2):
+        if number % div == 0:
+            return False
+
+    return True
+
+def test_is_prime():
+    assert is_prime(1) == False
+    assert is_prime(2) == True
+    assert is_prime(25) == False
+    assert is_prime(100) == False
+    assert is_prime(101) == True
+
 def main():
     # test_HashTable()
 
-    # Example usage
-    ht = HashTable()
-    ht.add("apple")
-    ht.add("banana")
-    ht.add("cherry")
+    test_is_prime()
 
-    print("Hash Table:", ht)
-    print("Position of 'banana':", ht.get_position("banana"))
-    print("Position of 'cherry':", ht.get_position("cherry"))
-    print("Position of 'apple':", ht.get_position("apple"))
-    print("Position of 'non-existent key':", ht.get_position("non-existent key"))
+    ht = HashTable()
+    ht['apple'] = 10
+    ht['banana'] = 20
+    ht['grape'] = 30
+
+    print(ht)  # Show the current hash table
+
+    print(ht['apple'])  # Output: 10
+    print(ht['banana'])  # Output: 20
+
+    ht['apple'] = 50  # Update the value associated with 'apple'
+    print(ht['apple'])  # Output: 50
+
+    del ht['banana']  # Remove the 'banana' key-value pair
+    print(ht)  # Show the updated hash table
+
+    ht['a'] = 0
+    ht['b'] = 1
+    ht['c'] = 2
+    ht['12'] = 3
+
+    print(ht)
 
 
 if __name__ == "__main__":
