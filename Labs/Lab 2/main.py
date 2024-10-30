@@ -1,4 +1,5 @@
 from HashTable import HashTable
+from SymbolTable import SymbolTable
 
 
 def test_add():
@@ -128,6 +129,22 @@ def main():
 
     for key in ht.keys():
         print(key)
+
+    st = SymbolTable()
+
+    print(st)
+
+    st.add('a')
+
+    print(st)
+    print(len(st))
+    for symbol in st.symbols():
+        print(symbol)
+
+    st.clear()
+
+    print(st)
+    print(len(st))
 
 
 if __name__ == "__main__":

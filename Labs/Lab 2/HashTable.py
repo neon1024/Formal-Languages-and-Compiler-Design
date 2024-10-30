@@ -145,6 +145,18 @@ class HashTable(dict):
             if item:
                 yield item[0]
 
+    def values(self):
+        for item in self.table:
+            if item:
+                yield item[1]
+
+    def clear(self):
+        for index in range(self.capacity):
+            if self.table[index] is not None:
+                self.table[index] = None
+
+        self.size = 0
+
     def __repr__(self):
         """return a string representation of the hash table"""
         return str(self)
