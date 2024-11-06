@@ -67,10 +67,33 @@ def test_constant_type():
         assert identify_token(token) == token_type
 
 
+def test_string_type():
+    expected_results = {"'hello'": "string", '"world"': "string", "1": "constant"}
+
+    for token, token_type in expected_results.items():
+        assert identify_token(token) == token_type
+
+
+def test_operator_type():
+    expected_results = {"+": "operator", '*=': "operator", "1": "constant"}
+
+    for token, token_type in expected_results.items():
+        assert identify_token(token) == token_type
+
+
+def test_separator_type():
+    expected_results = {" ": "separator", '"world"': "string", "}": "separator"}
+
+    for token, token_type in expected_results.items():
+        assert identify_token(token) == token_type
+
+
 def test_identify_token():
     test_keyword_type()
     test_identifier_type()
-
+    test_operator_type()
+    test_separator_type()
+    test_string_type()
     test_constant_type()
 
 
