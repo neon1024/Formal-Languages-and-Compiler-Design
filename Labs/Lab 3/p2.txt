@@ -4,10 +4,10 @@ fun is_prime(candidate: &num) -> bool {
 	for(divider: num = 2; divider <= candidate / 2; divider++)
 		match(divider) {
 			case(candidate % divider == 0) =>
-				ret False;
+				ret false;
 			default:
 				break;
 		}
 
-	ret True;
+	ret true;
 }

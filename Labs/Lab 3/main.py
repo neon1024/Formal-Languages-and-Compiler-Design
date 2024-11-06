@@ -1,3 +1,4 @@
+from LexicalError import LexicalError
 from SymbolTable import SymbolTable
 
 import re
@@ -5,12 +6,10 @@ import re
 
 def identify_token(token):
     keywords = ["nothing", "int", "num", "text", "character", "boolean", "true", "false", "list", "dictionary", "structure",
-                "if", "else", "match", "case", "while", "for", "fun", "ret", "fixed", "try", "catch", "throw", "go"]
+                "if", "else", "match", "case", "default", "break", "while", "for", "fun", "ret", "fixed", "try", "catch", "throw", "go"]
 
-    # identifiers_regex_string = "(_)?[a-zA-Z](_)? | (_)?[0-9](_)? | (_)?[a-zA-Z](_)?([a-zA-Z])?(_)?([0-9])?(_)? | (_)?[0-9](_)?([a-zA-Z])?(_)?([0-9])?(_)?"
     identifiers_regex_pattern = r"^[a-zA-Z_][a-zA-Z0-9_]*$"
 
-    # - constants: "fixed" + IDENTIFIER +  ":" + TYPE | arraydecl
     constants_regex_pattern = r"^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?$"
 
     # - strings: starts and ends with ", or ' for char
@@ -19,7 +18,7 @@ def identify_token(token):
                  "+=": "i_addition", "-=": "i_subtraction", "/=": "i_division", "*=": "i_multiplication", "**=": "i_power", "<": "less_than",
                  "<=": "less_or_equal_than", ">": "greater_than", ">=": "greater_or_equal_than", "==": "equal", "!=": "not_equal",
                  "and": "logical_and", "&&": "logical_and", "or": "logical_or", "||": "logical_or", "++": "increment", "--": "decrement",
-                 "->": "return_type", ".": "selector"}
+                 "?": "query", "->": "return_type", ".": "selector", "//": "comment", "/*": "comment_begin", "*/": "comment_end"}
 
     separators = {" ": "white_space", ",": "enumeration", ";": "statement_end", ":": "specifier", "&": "reference", "(": "call_start", ")": "call_end",
                   "[": "selector_start", "]": "selector_end", "{": "block_start", "}": "block_end"}
@@ -102,6 +101,9 @@ def is_symbol(token):
 
     token_type = identify_token(token)
 
+    if token_type == "error":
+        raise LexicalError()
+
     return token_type in symbol_types
 
 
@@ -124,8 +126,11 @@ def scan(file):
             tokens = [token for token in tokens if token]  # symbols are unique in ST
 
             for token in tokens:
-                if is_symbol(token) and token not in symbols:
-                    symbols.append(token)
+                try:
+                    if is_symbol(token) and token not in symbols:
+                        symbols.append(token)
+                except LexicalError as lexical_error:
+                    print(lexical_error, line_number)
 
         print(symbols)
 
@@ -138,7 +143,7 @@ def save_to(symbol_table, output_file):
         positions = symbol_table.positions()
 
         for i in range(len(symbols)):
-            file.write(str(positions[i]) + ": " + symbols[i] + "\n")
+            file.write(str(positions[i]) + ": " + str(symbols[i]) + "\n")
 
 
 def main():
@@ -152,7 +157,7 @@ def main():
         for symbol in symbols:
             symbol_table.add(symbol)
 
-        break  # TODO read the rest
+        #break  # TODO read the rest
 
     print(symbol_table)
 
