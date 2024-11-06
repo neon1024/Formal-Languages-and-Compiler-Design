@@ -7,7 +7,11 @@ class SymbolTable:
         self.__current_free_position = 0
 
     def add(self, symbol):
+        if symbol in self.__hash_table.values():
+            return
+
         self.__hash_table[self.__current_free_position] = symbol
+        self.__current_free_position += 1
 
     def symbols(self):
         return self.__hash_table.values()
