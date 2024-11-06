@@ -46,13 +46,6 @@ def identify_token(token):
     return "error"
 
 
-def test_identifier_type():
-    expected_results = {'_validIdentifier': "identifier", '123Invalid': "error", '_123': "identifier", 'valid_123': "identifier", 'not-valid': "error"}
-
-    for token, token_type in expected_results.items():
-        assert identify_token(token) == token_type
-
-
 def test_keyword_type():
     expected_results = {'_validIdentifier': "identifier", '123Invalid': "error", '_123': "identifier", 'for': "keyword", 'if': "keyword"}
 
@@ -60,15 +53,8 @@ def test_keyword_type():
         assert identify_token(token) == token_type
 
 
-def test_constant_type():
-    expected_results = {'123': "constant", '-456': "constant", '3.14': "constant", '-.678': "constant", '1e10': "constant", '123.': "constant", '.456': "constant", '-2.5E-3': "constant", '"not_a_number"': "string"}
-
-    for token, token_type in expected_results.items():
-        assert identify_token(token) == token_type
-
-
-def test_string_type():
-    expected_results = {"'hello'": "string", '"world"': "string", "1": "constant"}
+def test_identifier_type():
+    expected_results = {'_validIdentifier': "identifier", '123Invalid': "error", '_123': "identifier", 'valid_123': "identifier", 'not-valid': "error"}
 
     for token, token_type in expected_results.items():
         assert identify_token(token) == token_type
@@ -83,6 +69,20 @@ def test_operator_type():
 
 def test_separator_type():
     expected_results = {" ": "separator", '"world"': "string", "}": "separator"}
+
+    for token, token_type in expected_results.items():
+        assert identify_token(token) == token_type
+
+
+def test_string_type():
+    expected_results = {"'hello'": "string", '"world"': "string", "1": "constant"}
+
+    for token, token_type in expected_results.items():
+        assert identify_token(token) == token_type
+
+
+def test_constant_type():
+    expected_results = {'123': "constant", '-456': "constant", '3.14': "constant", '-.678': "constant", '1e10': "constant", '123.': "constant", '.456': "constant", '-2.5E-3': "constant", '"not_a_number"': "string"}
 
     for token, token_type in expected_results.items():
         assert identify_token(token) == token_type
