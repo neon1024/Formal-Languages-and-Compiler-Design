@@ -4,7 +4,7 @@ import re
 
 
 def identify_token(token):
-    keywords = ["nothing", "integer", "text", "character", "boolean", "true", "false", "list", "dictionary", "structure",
+    keywords = ["nothing", "int", "num", "text", "character", "boolean", "true", "false", "list", "dictionary", "structure",
                 "if", "else", "match", "case", "while", "for", "fun", "ret", "fixed", "try", "catch", "throw", "go"]
 
     # identifiers_regex_string = "(_)?[a-zA-Z](_)? | (_)?[0-9](_)? | (_)?[a-zA-Z](_)?([a-zA-Z])?(_)?([0-9])?(_)? | (_)?[0-9](_)?([a-zA-Z])?(_)?([0-9])?(_)?"
@@ -112,7 +112,7 @@ def scan(file):
     separators_regex = r"[ ,;:&()\[\]{}]"
 
     # TODO maintain the correct order of symbols
-    symbols = set()  # the symbols to add in the ST
+    symbols = []  # the symbols to add in the ST
 
     with open(file) as file:
         for line in file:
@@ -121,15 +121,24 @@ def scan(file):
             line_number += 1
 
             tokens = re.split(separators_regex, line)
-            tokens = set([token for token in tokens if token])  # symbols are unique in ST
+            tokens = [token for token in tokens if token]  # symbols are unique in ST
 
             for token in tokens:
-                if is_symbol(token):
-                    symbols.add(token)
+                if is_symbol(token) and token not in symbols:
+                    symbols.append(token)
 
         print(symbols)
 
     return symbols
+
+
+def save_to(symbol_table, output_file):
+    with open(output_file, "w") as file:
+        symbols = symbol_table.symbols()
+        positions = symbol_table.positions()
+
+        for i in range(len(symbols)):
+            file.write(str(positions[i]) + ": " + symbols[i] + "\n")
 
 
 def main():
@@ -146,6 +155,8 @@ def main():
         break  # TODO read the rest
 
     print(symbol_table)
+
+    save_to(symbol_table, "ST.out")
 
 
 if __name__ == "__main__":

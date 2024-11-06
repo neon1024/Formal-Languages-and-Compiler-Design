@@ -70,6 +70,12 @@ def main():
     print(st)
     print(len(st))
 
+    st.add('a')
+    st.add('b')
+    st.add('c')
+
+    print(st)
+
 
 if __name__ == "__main__":
     main()
