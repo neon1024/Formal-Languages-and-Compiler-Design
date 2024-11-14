@@ -1,7 +1,7 @@
 from HashTable import HashTable
 
 
-class ProgramInternalState:
+class ProgramInternalFormat:
     def __init__(self):
         self.__table = HashTable()
 

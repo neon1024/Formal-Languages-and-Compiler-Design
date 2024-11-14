@@ -1,5 +1,5 @@
 from LexicalError import LexicalError
-from ProgramInternalState import ProgramInternalState
+from ProgramInternalFormat import ProgramInternalFormat
 from SymbolTable import SymbolTable
 
 import re
@@ -141,11 +141,12 @@ def scan(file, symbol_table, program_internal_state):
                         "column: ", column_number
                     )
                     exit()
-    print(program_internal_state)
 
 
 def save_to(symbol_table, output_file):
     with open(output_file, "w") as file:
+        file.write("HashTable\n")
+
         symbols = symbol_table.symbols()
         positions = symbol_table.positions()
 
@@ -154,7 +155,6 @@ def save_to(symbol_table, output_file):
 
 
 def save_PIF_to(PIF, output_file):
-    print(len(PIF))
     with open(output_file, "w") as file:
         tokens = PIF.tokens()
         positions = PIF.positions()
@@ -165,9 +165,10 @@ def save_PIF_to(PIF, output_file):
 
 def main():
     symbol_table = SymbolTable()
-    program_internal_state = ProgramInternalState()
+    program_internal_state = ProgramInternalFormat()
 
-    input_files = ["p1.txt", "p2.txt", "p3.txt", "error.txt"]
+    # input_files = ["p1.txt", "p2.txt", "p3.txt", "error.txt"]
+    input_files = ["p1.txt"]
 
     for file in input_files:
         print("scanning", file)
