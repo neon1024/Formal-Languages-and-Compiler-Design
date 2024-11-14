@@ -1,3 +1,6 @@
+from DFA import DFA
+
+
 def scan(file, data):
     with open(file) as file:
         line = file.readline()
@@ -63,6 +66,7 @@ def print_menu_options():
     print("4: show the initial state")
     print("5: show the set of final states")
     print("6: show the transition functions")
+    print("7: create the DFA")
     print("x: exit")
 
 
@@ -95,6 +99,34 @@ def show_the_transition_functions(data):
         print(transition_function)
 
 
+def create_DFA(data):
+    transition_functions = data["transition_functions"]
+
+    transitions = {}
+
+    for transition_function in transition_functions:
+        key = transition_function[0:2]
+        value = transition_function[2:]
+        transitions[key] = value
+
+    dfa = DFA(data["states"], data["input_symbols"], data["initial_state"], data["final_states"], transitions)
+
+    data["DFA"] = dfa
+
+    print(dfa)
+    print(data["DFA"])
+
+
+def test_DFA(data):
+    test_strings = ['123', '-123', '3.14', '-0.99', '1.2e10', '+10.5', '0.5E-4']
+
+    dfa = data["DFA"]
+
+    results = {s: dfa.check_string(s) for s in test_strings}
+
+    print(results)
+
+
 def menu():
     menu_options = {"1": read_file,
                     "2": show_the_set_of_states,
@@ -102,9 +134,12 @@ def menu():
                     "4": show_the_initial_state,
                     "5": show_the_set_of_final_states,
                     "6": show_the_transition_functions,
+                    "7": create_DFA,
+                    "8": test_DFA,
                     "x": exit}
 
-    data = {"states": [], "input_symbols": [], "initial_state": "", "final_states": [], "transition_functions": []}
+    dfa = DFA()
+    data = {"states": [], "input_symbols": [], "initial_state": "", "final_states": [], "transition_functions": [], "DFA": dfa}
 
     while True:
         print_menu_options()
