@@ -1,8 +1,6 @@
 fun sum_of_n_elements(n: int, elements: lst) -> int {
 	sum: Int();
 
-	// element's type is auto by default in
-	// this case
 	for(element in elements)
 		sum += element;
 

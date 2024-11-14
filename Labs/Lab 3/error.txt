@@ -1,5 +1,5 @@
 fun max_øf_3(a: &int, b: &int, c: &int) -> int {
-	max_num =* a;
+    max_num =* a;
 
 	if(b > max_num)
 		max_num = b;

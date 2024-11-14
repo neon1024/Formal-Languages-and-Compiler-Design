@@ -13,13 +13,22 @@ class SymbolTable:
         self.__hash_table[symbol] = self.__index
         self.__index += 1
 
+    def position_of(self, symbol):
+        if symbol not in self.symbols():
+            raise Exception("[!] Symbol doesn't exist")
+
+        return self.__hash_table[symbol]
+
+    def __contains__(self, symbol):
+        return symbol in self.symbols()
+
     # TODO combine symbols and positions into a new method to get the data from the ST more easily
 
     def symbols(self):
-        return self.__hash_table.values()
+        return self.__hash_table.keys()
 
     def positions(self):
-        return self.__hash_table.keys()
+        return self.__hash_table.values()
 
     def clear(self):
         self.__hash_table.clear()

@@ -1,4 +1,5 @@
 from LexicalError import LexicalError
+from ProgramInternalState import ProgramInternalState
 from SymbolTable import SymbolTable
 
 import re
@@ -8,11 +9,9 @@ def identify_token(token):
     keywords = ["nothing", "int", "num", "text", "character", "boolean", "true", "false", "list", "dictionary", "structure",
                 "if", "else", "match", "case", "default", "break", "while", "for", "fun", "ret", "fixed", "try", "catch", "throw", "go"]
 
-    identifiers_regex_pattern = r"^[a-zA-Z_][a-zA-Z0-9_]*$"
+    identifiers_regex = r"^[a-zA-Z_][a-zA-Z0-9_]*$"
 
-    constants_regex_pattern = r"^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?$"
-
-    # - strings: starts and ends with ", or ' for char
+    constants_regex = r"^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?$"
 
     operators = {"+": "addition", "-": "subtraction", "*": "multiplication", "/": "division", "%": "remainder", "**": "power", "=": "assign",
                  "+=": "i_addition", "-=": "i_subtraction", "/=": "i_division", "*=": "i_multiplication", "**=": "i_power", "<": "less_than",
@@ -20,16 +19,18 @@ def identify_token(token):
                  "and": "logical_and", "&&": "logical_and", "or": "logical_or", "||": "logical_or", "++": "increment", "--": "decrement",
                  "?": "query", "->": "return_type", ".": "selector", "//": "comment", "/*": "comment_begin", "*/": "comment_end"}
 
+    increment_decrement_regex = r"^(\+\+|--)?[a-zA-Z_][a-zA-Z0-9_]*(\+\+|--)?$"
+
     separators = {" ": "white_space", ",": "enumeration", ";": "statement_end", ":": "specifier", "&": "reference", "(": "call_start", ")": "call_end",
-                  "[": "selector_start", "]": "selector_end", "{": "block_start", "}": "block_end"}
+                  "=>": "arrow", "[": "selector_start", "]": "selector_end", "{": "block_start", "}": "block_end"}
 
     if token in keywords:
         return "keyword"
 
-    if bool(re.match(identifiers_regex_pattern, token)):
+    if bool(re.match(identifiers_regex, token)):
         return "identifier"
 
-    if token in operators:
+    if token in operators or bool(re.match(increment_decrement_regex, token)):
         return "operator"
 
     if token in separators:
@@ -39,7 +40,7 @@ def identify_token(token):
         if token[0] == '"' and token[len(token) - 1] == '"' or token[0] == "'" and token[len(token) - 1] == "'":
             return "string"
 
-    if bool(re.match(constants_regex_pattern, token)):
+    if bool(re.match(constants_regex, token)):
         return "constant"
 
     return "error"
@@ -81,7 +82,8 @@ def test_string_type():
 
 
 def test_constant_type():
-    expected_results = {'123': "constant", '-456': "constant", '3.14': "constant", '-.678': "constant", '1e10': "constant", '123.': "constant", '.456': "constant", '-2.5E-3': "constant", '"not_a_number"': "string"}
+    expected_results = {'123': "constant", '-456': "constant", '3.14': "constant", '-.678': "constant", '1e10': "constant", '123.': "constant", '.456': "constant", '-2.5E-3': "constant",
+                        '"not_a_number"': "string"}
 
     for token, token_type in expected_results.items():
         assert identify_token(token) == token_type
@@ -107,34 +109,39 @@ def is_symbol(token):
     return token_type in symbol_types
 
 
-def scan(file):
+def scan(file, symbol_table, program_internal_state):
     line_number = 0
     column_number = 0
 
     separators_regex = r"[ ,;:&()\[\]{}]"
 
-    # TODO maintain the correct order of symbols
-    symbols = []  # the symbols to add in the ST
-
     with open(file) as file:
         for line in file:
-            line = line.strip()
-
             line_number += 1
 
-            tokens = re.split(separators_regex, line)
+            tokens = re.split(separators_regex, line.strip())
             tokens = [token for token in tokens if token]  # symbols are unique in ST
 
             for token in tokens:
                 try:
-                    if is_symbol(token) and token not in symbols:
-                        symbols.append(token)
+                    if is_symbol(token) and token not in symbol_table:
+                        symbol_table.add(token)
+
+                        program_internal_state.add(identify_token(token), position=symbol_table.position_of(token))
+
+                    else:
+                        program_internal_state.add(token)
+
                 except LexicalError as lexical_error:
-                    print(lexical_error, line_number)
+                    column_number = line.index(token) + 1
 
-        print(symbols)
-
-    return symbols
+                    print(
+                        "lexical error: ", f'"{token}"' + "\n" +
+                        "line: ", line_number, "\n" +
+                        "column: ", column_number
+                    )
+                    exit()
+    print(program_internal_state)
 
 
 def save_to(symbol_table, output_file):
@@ -146,22 +153,31 @@ def save_to(symbol_table, output_file):
             file.write(str(positions[i]) + ": " + str(symbols[i]) + "\n")
 
 
+def save_PIF_to(PIF, output_file):
+    print(len(PIF))
+    with open(output_file, "w") as file:
+        tokens = PIF.tokens()
+        positions = PIF.positions()
+
+        for i in range(len(tokens)):
+            file.write(str(positions[i]) + ": " + str(tokens[i]) + "\n")
+
+
 def main():
     symbol_table = SymbolTable()
+    program_internal_state = ProgramInternalState()
 
     input_files = ["p1.txt", "p2.txt", "p3.txt", "error.txt"]
 
     for file in input_files:
-        symbols = scan(file)
+        print("scanning", file)
 
-        for symbol in symbols:
-            symbol_table.add(symbol)
+        scan(file, symbol_table, program_internal_state)
 
-        #break  # TODO read the rest
-
-    print(symbol_table)
+        print(file, "is", "lexically correct\n")
 
     save_to(symbol_table, "ST.out")
+    save_PIF_to(program_internal_state, "PIF.out")
 
 
 if __name__ == "__main__":
