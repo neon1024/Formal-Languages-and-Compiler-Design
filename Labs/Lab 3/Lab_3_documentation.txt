@@ -1,3 +1,5 @@
+https://github.com/neon1024/Formal-Languages-and-Compiler-Design
+
 Overview
 This project implements a simple lexical analyzer for a custom programming language. It processes source code by reading an input file, tokenizing the text into lexical tokens, and building internal representations like a Symbol Table and Program Internal Format. The project is organized across several files:
 
