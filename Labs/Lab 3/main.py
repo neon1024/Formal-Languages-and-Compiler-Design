@@ -1,11 +1,12 @@
 from LexicalError import LexicalError
 from ProgramInternalFormat import ProgramInternalFormat
 from SymbolTable import SymbolTable
+from DFA import DFA
 
 import re
 
 
-def identify_token(token):
+def identify_token(token, validators=None):
     keywords = ["nothing", "int", "num", "text", "character", "boolean", "true", "false", "list", "dictionary", "structure",
                 "if", "else", "match", "case", "default", "break", "while", "for", "fun", "ret", "fixed", "try", "catch", "throw", "go"]
 
@@ -40,8 +41,11 @@ def identify_token(token):
         if token[0] == '"' and token[len(token) - 1] == '"' or token[0] == "'" and token[len(token) - 1] == "'":
             return "string"
 
-    if bool(re.match(constants_regex, token)):
+    if validators and validators["constants"].check_string(token):
         return "constant"
+    else:
+        if bool(re.match(constants_regex, token)):
+            return "constant"
 
     return "error"
 
@@ -98,10 +102,10 @@ def test_identify_token():
     test_constant_type()
 
 
-def is_symbol(token):
+def is_symbol(token, validators=None):
     symbol_types = ["identifier", "constant", "string"]
 
-    token_type = identify_token(token)
+    token_type = identify_token(token, validators)
 
     if token_type == "error":
         raise LexicalError()
@@ -109,7 +113,7 @@ def is_symbol(token):
     return token_type in symbol_types
 
 
-def scan(file, symbol_table, program_internal_state):
+def scan(file, symbol_table, program_internal_state, validators):
     line_number = 0
     column_number = 0
 
@@ -124,10 +128,10 @@ def scan(file, symbol_table, program_internal_state):
 
             for token in tokens:
                 try:
-                    if is_symbol(token) and token not in symbol_table:
+                    if is_symbol(token, validators) and token not in symbol_table:
                         symbol_table.add(token)
 
-                        program_internal_state.add(identify_token(token), position=symbol_table.position_of(token))
+                        program_internal_state.add(identify_token(token, validators), position=symbol_table.position_of(token))
 
                     else:
                         program_internal_state.add(token)
@@ -163,17 +167,51 @@ def save_PIF_to(PIF, output_file):
             file.write(str(positions[i]) + ": " + str(tokens[i]) + "\n")
 
 
+def read_DFA(input_filename):
+    with open(input_filename, "r") as file:
+        line = file.readline()
+
+        states = line.strip().split(',')
+
+        line = file.readline()
+
+        alphabet = line.strip().split(',')
+
+        line = file.readline()
+
+        initial_state = line.strip()
+
+        line = file.readline()
+
+        final_states = line.strip().split(',')
+
+        transition_functions = {}
+
+        for line in file:
+            stripped_line = line.strip()
+            key = stripped_line[:2]
+            value = stripped_line[2:]
+
+            transition_functions[key] = value
+
+        return states, alphabet, initial_state, final_states, transition_functions
+
+
 def main():
     symbol_table = SymbolTable()
     program_internal_state = ProgramInternalFormat()
 
+    constants_dfa = DFA(*read_DFA("constants.txt"))
+
+    validators = {"constants": constants_dfa}
+
     # input_files = ["p1.txt", "p2.txt", "p3.txt", "error.txt"]
-    input_files = ["p1.txt"]
+    input_files = ["p2.txt"]
 
     for file in input_files:
         print("scanning", file)
 
-        scan(file, symbol_table, program_internal_state)
+        scan(file, symbol_table, program_internal_state, validators)
 
         print(file, "is", "lexically correct\n")
 
