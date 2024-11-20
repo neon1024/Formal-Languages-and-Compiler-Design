@@ -67,6 +67,7 @@ def print_menu_options():
     print("5: show the set of final states")
     print("6: show the transition functions")
     print("7: create the DFA")
+    print("8: test the DFA")
     print("x: exit")
 
 
@@ -114,15 +115,25 @@ def create_DFA(data):
     data["DFA"] = dfa
 
     print(dfa)
-    print(data["DFA"])
 
-
+11
 def test_DFA(data):
-    test_strings = ['123', '-123', '3.14', '-0.99', '1.2e10', '+10.5', '0.5E-4']
+    expected_true = ['123', '-123', '3.14', '-0.99', '1.2e10', '+10.5', '0.5E-4']
+    expected_false = ['"string"', ".", "9.", "+", "-"]
+
+    test_strings = expected_false
 
     dfa = data["DFA"]
 
-    results = {s: dfa.check_string(s) for s in test_strings}
+    results = {}
+
+    for string in test_strings:
+        print("string:", string)
+        result = dfa.check_string(string)
+
+        results[string] = result
+
+        print("result:", result)
 
     print(results)
 
