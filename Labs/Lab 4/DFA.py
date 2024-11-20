@@ -16,10 +16,7 @@ class DFA:
 
         transition_key = self.__state + char
 
-        print("transition key:", transition_key)
-
         if transition_key in self.__transitions:
-            print("key:", transition_key, "value:", self.__transitions[transition_key])
             self.__state = self.__transitions[transition_key]
         else:
             self.__state = "REJECT"
@@ -31,13 +28,10 @@ class DFA:
         self.reset_state()
 
         for char in string:
-            print("char:", char)
             if char not in self.__alphabet and not char.isdigit():
                 return False  # Reject if the character is not in the alphabet or not a digit
 
             self.transition(char)
-
-            print("end state:", self.__state)
 
             if self.__state == 'REJECT':
                 return False
