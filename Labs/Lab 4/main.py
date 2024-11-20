@@ -51,14 +51,6 @@ def scan(file, data):
         #         "transition_functions": transition_functions}
 
 
-def create_input(file="1.txt"):
-    with open(file, "w") as file:
-        for p in range(0, 2):
-            for q in range(0, 2):
-                for z in range(0, 2):
-                    file.write(str(p) + str(q) + str(z) + "\n")
-
-
 def print_menu_options():
     print("1: read file")
     print("2: show the set of states")
@@ -116,24 +108,24 @@ def create_DFA(data):
 
     print(dfa)
 
-11
-def test_DFA(data):
-    expected_true = ['123', '-123', '3.14', '-0.99', '1.2e10', '+10.5', '0.5E-4']
-    expected_false = ['"string"', ".", "9.", "+", "-"]
 
-    test_strings = expected_false
+def test_DFA(data):
+    expected_true = ['123', "+1", '-1', '3.14', '-0.99', "+.9", '-.5', '12e10', "1E10", '0.5E-6', "1e-.1"]
+    expected_false = ['"string"', ".", "9.", "99.", "+", "-", "e", "E", "1e.", "1e.+"]
 
     dfa = data["DFA"]
 
     results = {}
 
-    for string in test_strings:
-        print("string:", string)
+    for string in expected_true:
         result = dfa.check_string(string)
 
         results[string] = result
 
-        print("result:", result)
+    for string in expected_false:
+        result = dfa.check_string(string)
+
+        results[string] = result
 
     print(results)
 
