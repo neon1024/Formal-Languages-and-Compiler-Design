@@ -1,5 +1,6 @@
 class DFA:
-    def __init__(self, states=[], alphabet=[], initial_state=None, final_states=[], transitions={}):
+    def __init__(self, type=None, states=[], alphabet=[], initial_state=None, final_states=[], transitions={}):
+        self.__type = type
         self.__states = states
         self.__alphabet = alphabet
         self.__initial_state = initial_state
@@ -13,6 +14,10 @@ class DFA:
     def transition(self, char):
         if char.isdigit():
             char = "d"
+        elif ord('a') <= ord(char) <= ord('z') or ord('A') <= ord(char) <= ord('Z'):
+            char = "e"
+        elif char == "_":
+            char = "u"
 
         transition_key = self.__state + char
 
@@ -42,4 +47,4 @@ class DFA:
         return str(self)
 
     def __str__(self):
-        return "" + str(self.__states) + "\n" + str(self.__alphabet) + "\n" + self.__initial_state + "\n" + str(self.__final_states) + "\n" + str(self.__transitions)
+        return "" + str(self.__type) + "\n" + str(self.__states) + "\n" + str(self.__alphabet) + "\n" + self.__initial_state + "\n" + str(self.__final_states) + "\n" + str(self.__transitions)
