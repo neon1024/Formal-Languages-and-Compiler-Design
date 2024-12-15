@@ -1,0 +1,99 @@
+Program -> Statement ; Program
+Program -> epsilon
+
+Statement -> DeclarationStatement
+Statement -> AssignStatement
+Statement -> IOStatement
+Statement -> IfStatement
+Statement -> WhileStatement
+Statement -> MatchStatement
+Statement -> CompoundStatement
+
+DeclarationStatement -> Identifier : Type
+DeclarationList -> DeclarationStatement
+DeclarationList -> DeclarationStatement , DeclarationList
+
+Type -> TypeValue
+Type -> ArrayDecl
+
+TypeValue -> nothing
+TypeValue -> boolean
+TypeValue -> character
+TypeValue -> integer
+TypeValue -> text
+TypeValue -> structure
+TypeValue -> list
+TypeValue -> dictionary
+
+ArrayDecl -> TypeValue [ Size ]
+
+AssignStatement -> Identifier = Expression
+
+Expression -> Term ExpressionRest
+ExpressionRest -> + Term ExpressionRest
+ExpressionRest -> epsilon
+
+Term -> Factor TermRest
+TermRest -> * Factor TermRest
+TermRest -> epsilon
+
+Factor -> ( Expression )
+Factor -> Identifier
+
+IOStatement -> input ( String )
+IOStatement -> output ( Identifier )
+
+CompoundStatement -> { StatementList }
+
+IfStatement -> if ( Condition ) { StatementList }
+IfStatement -> if ( Condition ) { StatementList } else { StatementList }
+
+MatchStatement -> match ( Expression ) { CaseList }
+
+WhileStatement -> while ( Condition ) { StatementList }
+
+Condition -> Expression RelationalOperator Expression
+
+RelationalOperator -> ==
+RelationalOperator -> <
+RelationalOperator -> <=
+RelationalOperator -> =
+RelationalOperator -> !=
+RelationalOperator -> >=
+RelationalOperator -> >
+
+CaseList -> CaseStatement
+CaseList -> CaseStatement ; CaseList
+CaseStatement -> Expression : Statement
+
+DeclarationStatement -> Identifier : Type
+
+Identifier -> Letter RestOfIdentifier
+RestOfIdentifier -> epsilon
+RestOfIdentifier -> Letter RestOfIdentifier
+RestOfIdentifier -> Digit RestOfIdentifier
+RestOfIdentifier -> _ RestOfIdentifier
+
+Size -> IntConstant
+
+Letter -> A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z | a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z | _
+
+Digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+NonZeroDigit -> 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+MaybeSign -> +
+MaybeSign -> -
+MaybeSign -> epsilon
+
+IntConstant -> MaybeSign PositiveNumber
+IntConstant -> 0
+PositiveNumber -> NonZeroDigit TheRestOfIntConstant
+TheRestOfIntConstant -> epsilon
+TheRestOfIntConstant -> Digit TheRestOfIntConstant
+
+String -> Char String
+String -> epsilon
+
+Char -> Letter
+Char -> Digit
