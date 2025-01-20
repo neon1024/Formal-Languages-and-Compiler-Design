@@ -1,0 +1,139 @@
+program : function_def
+
+function_def : 'fun' 'ID' '(' parameters ')' '->' type block_stmt
+
+parameters : parameter | parameter ',' parameters | epsilon
+
+parameter : 'ID' ':' type
+
+type : 'nothing' | 'boolean' | 'character' | 'integer' | 'text' | 'structure' | 'list' | 'dictionary'
+
+block_stmt : '{' stmt_list '}'
+
+stmt_list : stmt stmt_list | epsilon
+
+stmt : assign_stmt | if_stmt | match_stmt | while_stmt | for_stmt | iostmt | block_stmt
+
+assign_stmt : 'ID' '=' expr ';'
+
+expr : expr '+' term | expr '-' term | term
+
+term : term '*' factor | term '/' factor | factor
+
+factor : 'ID' | 'NUMBER' | '(' expr ')' | 'STRING' | 'CHARACTER'
+
+if_stmt : 'if' '(' condition ')' block_stmt else_stmt
+
+else_stmt : 'else' block_stmt | epsilon
+
+match_stmt : 'match' '(' expr ')' '{' case_stmt_list '}'
+
+case_stmt_list : case_stmt case_stmt_list | epsilon
+
+case_stmt : 'case' expr ':' stmt_list
+
+while_stmt : 'while' '(' condition ')' block_stmt
+
+for_stmt : 'for' '(' assign_stmt condition ';' expr ')' block_stmt
+
+iostmt : input_stmt | output_stmt
+
+input_stmt : 'input' '(' 'STRING' ')'
+
+output_stmt : 'output' '(' 'ID' ')'
+
+condition : expr relop expr
+
+relop : '<' | '<=' | '>' | '>=' | '==' | '!='
+
+'+'  : ADDITION
+
+'-'  : SUBTRACTION
+
+'*'  : MULTIPLICATION
+
+'/'  : DIVISION
+
+'%'  : REMAINDER
+
+'**' : POWER
+
+'='  : ASSIGN
+
+','  : COMMA
+
+';'  : SEMI
+
+':'  : COLON
+
+'('  : PAREN_OPEN
+
+')'  : PAREN_CLOSE
+
+'{'  : BRACE_OPEN
+
+'}'  : BRACE_CLOSE
+
+'fun'        : FUN_KEYWORD
+
+'if'         : IF_KEYWORD
+
+'else'       : ELSE_KEYWORD
+
+'while'      : WHILE_KEYWORD
+
+'for'        : FOR_KEYWORD
+
+'match'      : MATCH_KEYWORD
+
+'case'       : CASE_KEYWORD
+
+'input'      : INPUT_KEYWORD
+
+'output'     : OUTPUT_KEYWORD
+
+'return'     : RETURN_KEYWORD
+
+'nothing'    : NOTHING_KEYWORD
+
+'true'       : TRUE_KEYWORD
+
+'false'      : FALSE_KEYWORD
+
+'list'       : LIST_KEYWORD
+
+'dictionary' : DICTIONARY_KEYWORD
+
+'structure'  : STRUCTURE_KEYWORD
+
+'integer'    : INTEGER_KEYWORD
+
+'text'       : TEXT_KEYWORD
+
+'boolean'    : BOOLEAN_KEYWORD
+
+'character'  : CHARACTER_KEYWORD
+
+'fixed'      : FIXED_KEYWORD
+
+'try'        : TRY_KEYWORD
+
+'catch'      : CATCH_KEYWORD
+
+'throw'      : THROW_KEYWORD
+
+'go'         : GO_KEYWORD
+
+'ID' : LETTER (LETTER | DIGIT | '_')*
+
+'NUMBER'  : DIGIT+
+
+'STRING'  : '"' (CHARACTER | DIGIT)* '"'
+
+'CHARACTER' : '\'' (LETTER | DIGIT) '\'
+
+'LETTER' : 'a'..'z' | 'A'..'Z'
+
+'DIGIT' : '0'..'9'
+
+'SPACE' : ' ' | '\t' | '\n' | '\r'
